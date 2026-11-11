@@ -1,0 +1,15 @@
+using System.Runtime.CompilerServices;
+using UnityEngine;
+
+public class Trap : MonoBehaviour
+{
+    public GameObject objectToAppear;
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            objectToAppear.SetActive(true);
+        }
+    }
+}
