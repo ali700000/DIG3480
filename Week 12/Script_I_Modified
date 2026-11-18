@@ -1,1 +1,133 @@
-W
+using UnityEngine;
+using UnityEngine.InputSystem;
+
+public class PlayerMovement2 : MonoBehaviour
+{
+    public float moveSpeed = 5f;
+    public Rigidbody2D rb;
+
+    public SpriteRenderer spriteRenderer;
+    public Sprite spriteUp;
+    public Sprite spriteDown;
+    public Sprite spriteLeft;
+    public Sprite spriteRight;
+
+    public SwordMovement swordMovement;
+
+    private Vector2 movement;
+    private Vector2 facingDirection = Vector2.down;
+
+    void Start ()
+    {
+
+    }
+    
+    void Update()
+    {
+        Movement();
+    }
+
+    void FixedUpdate()
+    {
+        rb.linearVelocity = movement * moveSpeed;
+    }
+
+    void Movement()
+    {
+        if (Keyboard.current == null)
+            return;
+
+        float speedX = 0f;
+        float speedY = 0f;
+
+        if (Keyboard.current.aKey.isPressed)
+            speedX = -1f;
+        else if (Keyboard.current.dKey.isPressed)
+            speedX = 1f;
+
+        if (Keyboard.current.wKey.isPressed)
+            speedY = 1f;
+        else if (Keyboard.current.sKey.isPressed)
+            speedY = -1f;
+
+        movement = new Vector2(speedX, speedY).normalized;
+
+        if (movement == Vector2.zero)
+            return;
+
+        // Choose one direction when moving diagonally
+        if (Mathf.Abs(movement.x) > Mathf.Abs(movement.y))
+        {
+            facingDirection = movement.x < 0
+                ? Vector2.left : Vector2.right;
+        }
+        else
+        {
+            facingDirection = movement.y > 0
+                ? Vector2.up : Vector2.down;
+        }
+
+        if (facingDirection == Vector2.left)
+            spriteRenderer.sprite = spriteLeft;
+        else if (facingDirection == Vector2.right)
+            spriteRenderer.sprite = spriteRight;
+        else if (facingDirection == Vector2.up)
+            spriteRenderer.sprite = spriteUp;
+        else
+            spriteRenderer.sprite = spriteDown;
+
+        if (swordMovement != null)
+            swordMovement.SetDirection(facingDirection);
+    }
+}
+
+
+
+using UnityEngine;
+
+public class SwordMovement : MonoBehaviour
+{
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+
+    public Transform firePoint;
+
+    public float swordDistance = 0.6f;
+    public float firePointDistance = 0.5f;
+
+    public void SetDirection(Vector2 direction)
+    {
+        if (direction == Vector2.zero)
+            return;
+
+        transform.localPosition = new Vector3(
+                direction.x * swordDistance,
+                direction.y * swordDistance,
+                0f
+            );
+
+        float angle = Mathf.Atan2(
+            direction.y, direction.x
+        ) * Mathf.Rad2Deg;
+
+        transform.localRotation = Quaternion.Euler(0f, 0f, angle);
+
+        if (firePoint != null)
+        {
+            firePoint.localPosition =
+                new Vector3(firePointDistance, 0f, 0f);
+        }
+    }
+}
+
+
